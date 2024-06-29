@@ -20,3 +20,4 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.plugins."console_scripts"]
 "serve" = "gpxs.main:serve"
+"secret" = "gpxs.secret:generate_key"
