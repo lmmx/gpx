@@ -149,8 +149,10 @@ async def create_card(column_id: int, request: Request):
             status_code=response.status_code, detail="Error creating card"
         )
 
-
-if __name__ == "__main__":
+def serve():
     import uvicorn
 
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+if __name__ == "__main__":
+    serve()
