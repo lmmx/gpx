@@ -1,194 +1,75 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-gray-100">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GitHub Projects Manager</title>
-    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
-    <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+    <title>GPX Projects</title>
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+    <script src="https://unpkg.com/hyperscript.org@0.9.8"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="h-full">
-    <div class="min-h-full">
-        <nav class="bg-gray-800">
-            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div class="flex h-16 items-center justify-between">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <img class="h-8 w-8" src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub">
-                        </div>
-                        <div class="hidden md:block">
-                            <div class="ml-10 flex items-baseline space-x-4">
-                                <a href="#" class="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page">Dashboard</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-8">GPX Projects</h1>
+        
+        <div id="login-section" class="mb-8">
+            <button hx-get="https://gpx.onrender.com/login" 
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Login with GitHub
+            </button>
+        </div>
+        
+        <div id="projects-section" class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Your Projects</h2>
+            <div id="projects" hx-get="https://gpx.onrender.com/projects" hx-trigger="load">
+                Loading projects...
             </div>
-        </nav>
-
-        <header class="bg-white shadow">
-            <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                <h1 class="text-3xl font-bold tracking-tight text-gray-900">GitHub Projects Manager</h1>
+        </div>
+        
+        <div id="project-items-section" class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Project Items</h2>
+            <select id="project-selector" class="mb-4 p-2 border rounded"
+                    _="on change set projectId to my.value
+                                then fetch items from server">
+                <option value="">Select a project</option>
+            </select>
+            <div id="project-items">
+                Select a project to view items
             </div>
-        </header>
-
-        <main>
-            <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-                <div id="app" class="px-4 py-6 sm:px-0">
-                    <!-- Login Page -->
-                    <div id="login-page">
-                        <div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl p-6">
-                            <h2 class="text-2xl font-bold mb-4 text-gray-900">Login</h2>
-                            <form hx-on::submit="localStorage.setItem('github_token', this.api_key.value); htmx.ajax('GET', '/projects', {target: '#app', swap: 'innerHTML'}); return false;">
-                                <div class="mb-4">
-                                    <label for="api-key" class="block text-gray-700 text-sm font-bold mb-2">GitHub API Key:</label>
-                                    <input type="password" id="api-key" name="api_key" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                                </div>
-                                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out">
-                                    Login
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-
-                    <!-- Project Selection Page -->
-                    <div id="project-selection" class="hidden">
-                        <h2 class="text-2xl font-bold mb-4 text-gray-900">Select a Project</h2>
-                        <div id="project-list" hx-get="/projects" hx-trigger="load" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <!-- Projects will be loaded here -->
-                        </div>
-                    </div>
-
-                    <!-- Project Details Page -->
-                    <div id="project-details" class="hidden">
-                        <h2 id="project-title" class="text-2xl font-bold mb-4 text-gray-900"></h2>
-                        <div id="task-list" class="space-y-4">
-                            <!-- Tasks will be loaded here -->
-                        </div>
-                        <button hx-get="/new-task-form" hx-target="#task-list" hx-swap="beforeend" class="mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out">
-                            Add New Task
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </main>
+        </div>
+        
+        <div id="add-item-section" class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Add New Item</h2>
+            <form hx-post="https://gpx.onrender.com/project/{projectId}/item"
+                  hx-target="#project-items"
+                  hx-swap="beforeend"
+                  _="on submit set my.projectId to #project-selector.value">
+                <input type="text" name="note" placeholder="Enter item note" 
+                       class="p-2 border rounded mr-2" required>
+                <button type="submit" 
+                        class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                    Add Item
+                </button>
+            </form>
+        </div>
     </div>
 
     <script type="text/hyperscript">
-        behavior ProjectCard
-            on click
-                set #project-selection.hidden to true
-                set #project-details.hidden to false
-                fetch `/project/${@data-project-id}`
-                    then put it into #project-details
-            end
+        def fetch items from server
+            set #project-items.innerHTML to "Loading items..."
+            fetch(`https://gpx.onrender.com/project/${projectId}/items`)
+                then put the result into #project-items
         end
 
-        behavior TaskItem
-            on click
-                fetch `/task/${@data-task-id}`
-                    then put it into #task-details
+        on htmx:afterOnLoad(#projects)
+            for project in #projects div
+                get the textContent of the h3 in project
+                set projectName to it
+                get the id of project
+                set projectId to it
+                add an option with projectName and value projectId to #project-selector
             end
         end
-    </script>
-
-    <script>
-        htmx.on("htmx:configRequest", (event) => {
-            event.detail.headers['Authorization'] = `token ${localStorage.getItem('github_token')}`;
-        });
-
-        htmx.defineEndpoint("/projects", {
-            method: "GET",
-            url: "https://api.github.com/user/projects",
-            handler: function(response) {
-                const projects = JSON.parse(response);
-                return `
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        ${projects.map(project => `
-                            <div class="project-card bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition duration-300" data-project-id="${project.id}" _="install ProjectCard">
-                                <h3 class="text-lg font-semibold text-gray-900 mb-2">${project.name}</h3>
-                                <p class="text-gray-600">${project.body || 'No description'}</p>
-                                <button class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition duration-300">View Tasks</button>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            }
-        });
-
-        htmx.defineEndpoint("/project/:id", {
-            method: "GET",
-            url: "https://api.github.com/projects/:id/columns",
-            handler: function(response) {
-                const columns = JSON.parse(response);
-                return `
-                    <h2 id="project-title" class="text-2xl font-bold mb-6 text-gray-900">${columns[0]?.project_url.split('/').pop()}</h2>
-                    <div id="task-list" class="space-y-4">
-                        ${columns.map(column => `
-                            <div class="bg-white shadow-md rounded-lg p-6">
-                                <h3 class="text-xl font-semibold text-gray-900 mb-4">${column.name}</h3>
-                                <div hx-get="/column/${column.id}/cards" hx-trigger="load"></div>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <button hx-get="/new-task-form" hx-target="#task-list" hx-swap="beforeend" class="mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out">
-                        Add New Task
-                    </button>
-                `;
-            }
-        });
-
-        htmx.defineEndpoint("/column/:id/cards", {
-            method: "GET",
-            url: "https://api.github.com/projects/columns/:id/cards",
-            handler: function(response) {
-                const cards = JSON.parse(response);
-                return `
-                    <div class="space-y-2">
-                        ${cards.map(card => `
-                            <div class="task-item bg-gray-100 rounded-lg p-4" data-task-id="${card.id}" _="install TaskItem">
-                                <h4 class="text-lg font-semibold text-gray-900">${card.note || 'Untitled'}</h4>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            }
-        });
-
-        htmx.defineEndpoint("/new-task-form", {
-            method: "GET",
-            handler: function() {
-                return `
-                    <form hx-post="/task" hx-swap="afterend" class="bg-white shadow-md rounded-lg p-6 mt-6">
-                        <div class="mb-4">
-                            <label for="task-title" class="block text-gray-700 text-sm font-bold mb-2">Task Title:</label>
-                            <input type="text" id="task-title" name="title" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                        </div>
-                        <div class="mb-4">
-                            <label for="task-description" class="block text-gray-700 text-sm font-bold mb-2">Description:</label>
-                            <textarea id="task-description" name="description" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" rows="3"></textarea>
-                        </div>
-                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out">
-                            Create Task
-                        </button>
-                    </form>
-                `;
-            }
-        });
-
-        htmx.defineEndpoint("/task", {
-            method: "POST",
-            url: "https://api.github.com/projects/columns/:column_id/cards",
-            handler: function(response, triggeringElement) {
-                const newCard = JSON.parse(response);
-                return `
-                    <div class="task-item bg-gray-100 rounded-lg p-4 mt-4" data-task-id="${newCard.id}" _="install TaskItem">
-                        <h4 class="text-lg font-semibold text-gray-900">${newCard.note}</h4>
-                    </div>
-                `;
-            }
-        });
     </script>
 </body>
 </html>
