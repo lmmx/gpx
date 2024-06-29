@@ -1,0 +1,12 @@
+services:
+  - type: web
+    runtime: python
+    name: gpx
+    repo: https://github.com/lmmx/gpx
+    region: frankfurt
+    plan: free
+    buildCommand: poetry install
+    startCommand: serve
+    buildFilter:
+      ignoredPaths:
+        - app/**
