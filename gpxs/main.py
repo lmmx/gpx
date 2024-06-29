@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from starlette.middleware.sessions import SessionMiddleware
 import httpx
 import os
-from dotenv import load_load_dotenv
+from dotenv import load_dotenv
 
 load_dotenv()
 
