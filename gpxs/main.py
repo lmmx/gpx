@@ -1,8 +1,6 @@
-from fastapi import FastAPI, HTTPException, Depends, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel
 from starlette.middleware.sessions import SessionMiddleware
 import httpx
 import os
@@ -13,33 +11,27 @@ load_dotenv()
 app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET_KEY"))
 
-# Serve static files
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
 templates = Jinja2Templates(directory="templates")
 
 # GitHub App credentials
 GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
 GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
-GITHUB_REDIRECT_URI = os.getenv("GITHUB_REDIRECT_URI")
+GITHUB_REDIRECT_URI = "https://gpx.onrender.com/callback"  # Updated callback URL
 
 # GitHub API endpoints
 GITHUB_AUTH_URL = "https://github.com/login/oauth/authorize"
 GITHUB_TOKEN_URL = "https://github.com/login/oauth/access_token"
 GITHUB_API_URL = "https://api.github.com"
 
-
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
-
 
 @app.get("/login")
 async def login_github():
     return RedirectResponse(
         f"{GITHUB_AUTH_URL}?client_id={GITHUB_CLIENT_ID}&redirect_uri={GITHUB_REDIRECT_URI}"
     )
-
 
 @app.get("/callback")
 async def github_callback(code: str, request: Request):
@@ -59,7 +51,7 @@ async def github_callback(code: str, request: Request):
         data = response.json()
         access_token = data.get("access_token")
         request.session["access_token"] = access_token
-        return RedirectResponse(url="/")
+        return RedirectResponse(url="https://gpx-eta.vercel.app")  # Redirect to frontend after authentication
     else:
         raise HTTPException(status_code=400, detail="Could not retrieve access token")
 
