@@ -12,7 +12,10 @@ load_dotenv()
 app = FastAPI()
 
 app.add_middleware(
-    SessionMiddleware, secret_key=os.getenv("SESSION_SECRET_KEY"), https_only=True
+    SessionMiddleware,
+    secret_key=os.getenv("SESSION_SECRET_KEY"),
+    https_only=True,
+    session_cookie="gpx_session_id"
 )
 app.add_middleware(
     CORSMiddleware,
