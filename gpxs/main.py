@@ -120,7 +120,18 @@ async def get_projects(user: User = Depends(get_user)):
             status_code=response.status_code, detail="Failed to fetch projects"
         )
 
-    projects = response.json()
+    results = response.json()
+    errors = results.get("errors", [])
+    if errors:
+        raise HTTPException(
+            status_code=400, detail=f"Results came back with errors: {errors}"
+        )
+    projects = results.get("data", {}).get("viewer", {}).get("projectsV2")
+    if not projects:
+        raise HTTPException(
+            status_code=204, detail=f"Results came back with no content: {results}"
+        )
+    logger.warn(f"Got projects:\n{projects}")
     projects_html = "".join(
         [
             f"<div class='bg-white shadow rounded-lg p-4 mb-4'><h3 class='text-lg font-semibold'>{project['name']}</h3><p>{project['body']}</p></div>"
