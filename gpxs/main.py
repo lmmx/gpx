@@ -40,9 +40,10 @@ class User(BaseModel):
 
 
 def get_user(request: Request):
-    logger.info(f"Session data: {request.session}")
+    logger.warning(f"Request data: {request}")
+    logger.warning(f"Session data: {request.session}")
     user = request.session.get("user")
-    logger.info(f"User data from session: {user}")
+    logger.warning(f"User data from session: {user}")
     if not user:
         logger.warning("User not found in session")
         raise HTTPException(status_code=401, detail="User not authenticated")
