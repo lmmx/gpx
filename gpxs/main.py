@@ -106,7 +106,7 @@ async def get_projects(user: User = Depends(get_user)):
     }
     """)
     async with httpx.AsyncClient() as client:
-        response = await client.get(
+        response = await client.post(
             f"{GITHUB_API_URL}/graphql",
             headers={
                 "Authorization": f"token {user.access_token}",
