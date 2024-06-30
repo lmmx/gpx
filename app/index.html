@@ -57,17 +57,42 @@
         def fetchItems(projectId)
             set #project-items.innerHTML to "Loading items..."
             fetch(`https://gpx.onrender.com/project/${projectId}/items`)
-                then put it into #project-items
+                then response.json()
+                then call displayItems(it)
+        end
+
+        def displayItems(data)
+            set #project-items.innerHTML to ""
+            for column in data
+                set columnDiv to document.createElement("div")
+                set columnDiv.className to "bg-gray-100 p-4 mb-4"
+                set columnDiv.innerHTML to `<h4 class="text-md font-semibold">${column.column}</h4>`
+                for item in column.items
+                    set itemDiv to document.createElement("div")
+                    set itemDiv.className to "bg-white shadow rounded p-2 mb-2"
+                    set itemDiv.textContent to item.note
+                    columnDiv.appendChild(itemDiv)
+                end
+                #project-items.appendChild(columnDiv)
+            end
         end
 
         on htmx:afterOnLoad from #projects
-            for project in #projects.children
-                set projectName to the textContent of the h3 in project
-                set projectId to the id of project
+            set projectsData to JSON.parse(#projects.textContent)
+            set #projects.innerHTML to ""
+            for project in projectsData
+                set projectDiv to document.createElement("div")
+                set projectDiv.className to "bg-white shadow rounded-lg p-4 mb-4"
+                set projectDiv.innerHTML to `
+                    <h3 class="text-lg font-semibold">${project.name}</h3>
+                    <p>${project.body || ""}</p>
+                `
+                #projects.appendChild(projectDiv)
+
                 set newOption to document.createElement("option")
-                set newOption.textContent to projectName
-                set newOption.value to projectId
-                append newOption to #project-selector
+                set newOption.textContent to project.name
+                set newOption.value to project.id
+                #project-selector.appendChild(newOption)
             end
         end
     </script>
