@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Depends, Request
+import textwrap
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
@@ -89,13 +90,29 @@ async def callback(code: str, request: Request):
 
 @app.get("/projects", response_class=HTMLResponse)
 async def get_projects(user: User = Depends(get_user)):
+    query = textwrap.dedent("""
+    {
+      viewer {
+        projectsV2(first: 100) {
+          nodes {
+            id
+            title
+            number
+            closed
+            createdAt
+          }
+        }
+      }
+    }
+    """)
     async with httpx.AsyncClient() as client:
         response = await client.get(
-            f"{GITHUB_API_URL}/user/projects",
+            f"{GITHUB_API_URL}/graphql",
             headers={
                 "Authorization": f"token {user.access_token}",
                 "Accept": "application/vnd.github.v3+json",
             },
+            json={"query": query},
         )
 
     if response.status_code != 200:
