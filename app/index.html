@@ -25,7 +25,8 @@
             <div id="projects" 
                  hx-get="https://gpx.onrender.com/projects" 
                  hx-trigger="load" 
-		 hx-target="this">
+		 hx-target="this"
+		 hx-headers='{"X-Requested-With": "XMLHttpRequest"}'>
                 Loading projects...
             </div>
         </div>
