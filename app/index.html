@@ -21,7 +21,7 @@
         
         <div id="projects-section" class="mb-8">
             <h2 class="text-2xl font-semibold mb-4">Your Projects</h2>
-            <div id="projects" hx-get="https://gpx.onrender.com/projects" hx-trigger="load">
+            <div id="projects" hx-get="https://gpx.onrender.com/projects" hx-trigger="load" hx-target="this">
                 Loading projects...
             </div>
         </div>
@@ -29,8 +29,7 @@
         <div id="project-items-section" class="mb-8">
             <h2 class="text-2xl font-semibold mb-4">Project Items</h2>
             <select id="project-selector" class="mb-4 p-2 border rounded"
-                    _="on change set projectId to my.value
-                                then fetch items from server">
+                    _="on change call fetchItems(my.value)">
                 <option value="">Select a project</option>
             </select>
             <div id="project-items">
@@ -55,18 +54,16 @@
     </div>
 
     <script type="text/hyperscript">
-        def fetch items from server
+        def fetchItems(projectId)
             set #project-items.innerHTML to "Loading items..."
             fetch(`https://gpx.onrender.com/project/${projectId}/items`)
-                then put the result into #project-items
+                then put it into #project-items
         end
 
         on htmx:afterOnLoad(#projects)
             for project in #projects div
-                get the textContent of the h3 in project
-                set projectName to it
-                get the id of project
-                set projectId to it
+                set projectName to the textContent of the h3 in project
+                set projectId to the id of project
                 add an option with projectName and value projectId to #project-selector
             end
         end
