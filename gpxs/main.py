@@ -55,7 +55,7 @@ async def root():
 @app.get("/login")
 async def login():
     return RedirectResponse(
-        f"https://github.com/login/oauth/authorize?client_id={GITHUB_CLIENT_ID}&scope=project"
+        f"https://github.com/login/oauth/authorize?client_id={GITHUB_CLIENT_ID}&scope=projects_v2"
     )
 
 
@@ -80,22 +80,29 @@ async def callback(code: str, request: Request):
         raise HTTPException(status_code=400, detail="Failed to obtain access token")
 
     request.session["user"] = {"access_token": access_token}
-    return RedirectResponse("https://gpx-eta.vercel.app")
+    return RedirectResponse("https://gpx.onrender.com")
 
 
 @app.get("/projects", response_class=HTMLResponse)
 async def get_projects(user: User = Depends(get_user)):
     query = textwrap.dedent("""
     {
+    query {
       viewer {
+        id
+        login
+        name
         projectsV2(first: 100) {
           nodes {
-            id
-            title
-            number
             closed
             createdAt
+            public
+            number
+            resourcePath
+            title
+            url
           }
+          totalCount
         }
       }
     }
