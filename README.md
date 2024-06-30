@@ -1,3 +1,3 @@
-# gpm
+# gpx
 
-GitHub Project Manager web app written in HTMX
+GitHub Project management web app written in HTMX
