@@ -61,7 +61,7 @@
         end
 
         on htmx:afterOnLoad from #projects
-            for project in #projects div
+            for project in #projects
                 set projectName to the textContent of the h3 in project
                 set projectId to the id of project
                 add an option with projectName and value projectId to #project-selector
