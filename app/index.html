@@ -10,27 +10,31 @@
     <script>
         // Ensure htmx includes credentials (cookies) in requests
         document.addEventListener("htmx:configRequest", (event) => {
-console.log("Here we go", event);
+            console.log("Here we go", event);
             event.detail.credentials = 'include';
         });
     </script>
     <script>
-        document.getElementById('fetchProjects').addEventListener('click', async () => {
-            try {
-                const response = await fetch('https://gpx.onrender.com/projects', {
-                    method: 'GET',
-                    credentials: 'include',  // Include cookies
-                });
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('fetchProjects').addEventListener('click', async () => {
+                try {
+                    const response = await fetch('https://gpx.onrender.com/projects', {
+                        method: 'GET',
+                        credentials: 'include',  // Include cookies
+                    });
 
-                if (response.ok) {
-                    const data = await response.json();
-                    document.getElementById('response').textContent = JSON.stringify(data, null, 2);
-                } else {
-                    console.error('Failed to fetch projects', response.status);
+                    if (response.ok) {
+                        const data = await response.text(); // Change this to text() instead of json()
+                        document.getElementById('projects').innerHTML = data; // Update the projects div with the received HTML
+                    } else {
+                        console.error('Failed to fetch projects', response.status);
+                        document.getElementById('projects').textContent = 'Failed to fetch projects. Please try again.';
+                    }
+                } catch (error) {
+                    console.error('Error fetching projects', error);
+                    document.getElementById('projects').textContent = 'Error fetching projects. Please try again.';
                 }
-            } catch (error) {
-                console.error('Error fetching projects', error);
-            }
+            });
         });
     </script>
 </head>
@@ -38,10 +42,9 @@ console.log("Here we go", event);
     <div class="container mx-auto px-4 py-8">
         <h1 class="text-3xl font-bold mb-8">GPX Projects</h1>
 
-	<button 
-	    id="fetchProjects"
-	    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Fetch Projects</button>
-	    <pre id="response" class="py-2 px-4 rounded"></pre>
+        <button 
+            id="fetchProjects"
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">Fetch Projects</button>
         
         <div id="login-section" class="mb-8">
             <a href="https://gpx.onrender.com/login" 
