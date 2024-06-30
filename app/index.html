@@ -60,7 +60,7 @@
                 then put it into #project-items
         end
 
-        on htmx:afterOnLoad(#projects)
+        on htmx:afterOnLoad from #projects
             for project in #projects div
                 set projectName to the textContent of the h3 in project
                 set projectId to the id of project
