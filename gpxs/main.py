@@ -14,8 +14,7 @@ app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET_KEY"))
 app.add_middleware(
     CORSMiddleware,
-    # allow_origins=["https://gpx-eta.vercel.app"],
-    allow_origins=["*"],
+    allow_origins=["https://gpx-eta.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
