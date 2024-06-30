@@ -6,6 +6,10 @@ from pydantic import BaseModel
 import httpx
 import os
 from dotenv import load_dotenv
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 load_dotenv()
 
