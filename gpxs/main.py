@@ -24,7 +24,7 @@ app.add_middleware(
 )
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://gpx-eta.vercel.app"],
+    allow_origins=["https://gpx-eta.vercel.app", "https://gpx.onrender.com"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
