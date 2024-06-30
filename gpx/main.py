@@ -86,7 +86,6 @@ async def callback(code: str, request: Request):
 @app.get("/projects", response_class=HTMLResponse)
 async def get_projects(user: User = Depends(get_user)):
     query = textwrap.dedent("""
-    {
     query {
       viewer {
         id
