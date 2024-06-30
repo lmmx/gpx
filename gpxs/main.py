@@ -19,7 +19,7 @@ app = FastAPI()
 app.add_middleware(
     SessionMiddleware,
     secret_key=os.getenv("SESSION_SECRET_KEY"),
-    https_only=True,
+    https_only=False,
     session_cookie="gpx_session_id",
     same_site="none",
 )
