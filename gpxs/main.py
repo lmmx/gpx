@@ -134,8 +134,9 @@ async def get_projects(user: User = Depends(get_user)):
     logger.warn(f"Got projects:\n{projects}")
     projects_html = "".join(
         [
-            f"<div class='bg-white shadow rounded-lg p-4 mb-4'><h3 class='text-lg font-semibold'>{project['name']}</h3><p>{project['body']}</p></div>"
-            for project in projects
+            f"<div class='bg-white shadow rounded-lg p-4 mb-4'><h3 class='text-lg
+            font-semibold'>{idx}: {'Project name here'}</h3><p>{str(project)}</p></div>"
+            for idx, project in enumerate(projects)
         ]
     )
 
