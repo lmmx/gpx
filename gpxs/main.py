@@ -11,7 +11,9 @@ load_dotenv()
 
 app = FastAPI()
 
-app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET_KEY"))
+app.add_middleware(
+    SessionMiddleware, secret_key=os.getenv("SESSION_SECRET_KEY"), https_only=True
+)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://gpx-eta.vercel.app"],
