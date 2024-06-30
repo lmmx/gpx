@@ -11,6 +11,7 @@ load_dotenv()
 
 app = FastAPI()
 
+# Cookie named "gpx_session_id" to be set on `https://gpx.onrender.com`
 app.add_middleware(
     SessionMiddleware,
     secret_key=os.getenv("SESSION_SECRET_KEY"),
