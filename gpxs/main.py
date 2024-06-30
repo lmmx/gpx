@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Depends, Request
+from pathlib import Path
 import textwrap
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -24,18 +25,12 @@ app.add_middleware(
     session_cookie="gpx_session_id",
     same_site="none",
 )
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["https://gpx-eta.vercel.app", "https://gpx.onrender.com"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
 GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
 GITHUB_API_URL = "https://api.github.com"
 
+index = (Path(__file__).parent / "index.html").read_text()
 
 class User(BaseModel):
     access_token: str
@@ -52,9 +47,9 @@ def get_user(request: Request):
     return User(**user)
 
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 async def root():
-    return {"message": "Welcome to GPX Projects API"}
+    return HTMLResponse(content=index)
 
 
 @app.get("/login")
