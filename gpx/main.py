@@ -32,6 +32,7 @@ GITHUB_API_URL = "https://api.github.com"
 
 index = (Path(__file__).parent / "index.html").read_text()
 
+
 class User(BaseModel):
     access_token: str
 
@@ -49,18 +50,36 @@ def get_user(request: Request):
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
-    return HTMLResponse(content=index)
+    return index
 
 
-@app.get("/login")
+@app.get("/login", response_class=RedirectResponse)
 async def login():
-    scopes = "project read:project projects_v2 read:org repo read:user user:email"
-    return RedirectResponse(
-        f"https://github.com/login/oauth/authorize?client_id={GITHUB_CLIENT_ID}&scope={scopes}"
-    )
+    gh_scopes = [
+        "user",
+        "public_repo",
+        "repo",
+        "repo_deployment",
+        "repo:status",
+        "read:repo_hook",
+        "read:org",
+        "read:public_key",
+        "read:gpg_key",
+        "read:packages",
+        "read:discussion",
+        "read:enterprise",
+        "read:project",
+    ]
+    # This is the URL suffix used by the GitHub GraphQL API Explorer app:
+    # params = "&scope=user%2Cpublic_repo%2Crepo%2Crepo_deployment%2Crepo%3Astatus%2Cread%3Arepo_hook%2Cread%3Aorg%2Cread%3Apublic_key%2Cread%3Agpg_key%2Cread%3Apackages%2Cread%3Adiscussion%2Cread%3Aenterprise%2Cread%3Aproject"
+    scopes = urllib.parse.quote(",".join(gh_scopes))
+    # This is the one I was using:
+    # scopes = "project read:project projects_v2 read:org repo read:user user:email"
+    url = f"https://github.com/login/oauth/authorize?client_id={GITHUB_CLIENT_ID}&scope={scopes}"
+    return url
 
 
-@app.get("/callback")
+@app.get("/callback", response_class=RedirectResponse)
 async def callback(code: str, request: Request):
     params = {
         "client_id": GITHUB_CLIENT_ID,
@@ -81,12 +100,13 @@ async def callback(code: str, request: Request):
         raise HTTPException(status_code=400, detail="Failed to obtain access token")
 
     request.session["user"] = {"access_token": access_token}
-    return RedirectResponse("https://gpx.onrender.com")
+    return "https://gpx.onrender.com"
 
 
 @app.get("/projects", response_class=HTMLResponse)
 async def get_projects(user: User = Depends(get_user)):
-    query = textwrap.dedent("""
+    query = textwrap.dedent(
+        """
     query {
       viewer {
         id
@@ -106,7 +126,8 @@ async def get_projects(user: User = Depends(get_user)):
         }
       }
     }
-    """)
+    """
+    )
     async with httpx.AsyncClient() as client:
         response = await client.post(
             f"{GITHUB_API_URL}/graphql",
