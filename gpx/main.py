@@ -23,7 +23,7 @@ app.add_middleware(
     secret_key=os.getenv("SESSION_SECRET_KEY"),
     https_only=True,
     session_cookie="gpx_session_id",
-    same_site="none",
+    same_site="strict",
 )
 
 GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
@@ -54,8 +54,9 @@ async def root():
 
 @app.get("/login")
 async def login():
+    scopes = "project read:project projects_v2 read:org repo read:user user:email"
     return RedirectResponse(
-        f"https://github.com/login/oauth/authorize?client_id={GITHUB_CLIENT_ID}&scope=projects_v2"
+        f"https://github.com/login/oauth/authorize?client_id={GITHUB_CLIENT_ID}&scope={scopes}"
     )
 
 
