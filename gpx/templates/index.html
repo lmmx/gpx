@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPX Projects</title>
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+    <script src="https://unpkg.com/hyperscript.org@0.9.8"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/rest.js/15.2.6/octokit-rest.min.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-8">GPX Projects</h1>
+        
+	{% include "components/login_section.html" %}
+
+	{% include "components/projects_section.html" %}
+        
+	{% include "components/project_items_section.html" %}
+        
+	{% include "components/add_item_section.html" %}
+    </div>
+
+    <script type="text/hyperscript">
+	{% include "components/hyperscript.html" %}
+    </script>
+</body>
+</html>

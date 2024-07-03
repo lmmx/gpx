@@ -1,0 +1,14 @@
+<div id="add-item-section" class="mb-8">
+    <h2 class="text-2xl font-semibold mb-4">Add New Item</h2>
+    <form hx-post="/project/{projectId}/item"
+          hx-target="#project-items"
+          hx-swap="beforeend"
+          _="on submit set my.projectId to #project-selector.value">
+        <input type="text" name="note" placeholder="Enter item note" 
+               class="p-2 border rounded mr-2" required>
+        <button type="submit" 
+                class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+            Add Item
+        </button>
+    </form>
+</div>

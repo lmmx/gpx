@@ -1,6 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from pathlib import Path
 from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 import os
 from dotenv import load_dotenv
@@ -25,12 +26,11 @@ app.add_middleware(
     same_site="strict",
 )
 
-index = (Path(__file__).parent / "index.html").read_text()
-
+templates = Jinja2Templates(directory="gpx/templates")
 
 @app.get("/", response_class=HTMLResponse)
-async def root():
-    return index
+async def root(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 
 def serve():

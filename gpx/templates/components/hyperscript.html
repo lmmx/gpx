@@ -1,0 +1,16 @@
+def fetchItems(projectId)
+    set #project-items.innerHTML to "Loading items..."
+    fetch(`/project/${projectId}/items`)
+        then put it into #project-items
+end
+
+on htmx:afterOnLoad from #projects
+    for project in #projects.children
+        set projectName to the textContent of the h3 in project
+        set projectId to the id of project
+        set newOption to document.createElement("option")
+        set newOption.textContent to projectName
+        set newOption.value to projectId
+        append newOption to #project-selector
+    end
+end
