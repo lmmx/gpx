@@ -1,14 +1,16 @@
 <div id="projects" hx-swap-oob="true" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
     {% for project in projects %}
-    <div class='bg-white shadow rounded-lg p-4'>
-        <h3 class='text-lg font-semibold mb-2'>
-            <a href='{{ project.url }}' target='_blank' class='text-blue-600 hover:text-blue-800'>
-                {{ project.title }}
-            </a>
+    <div class='bg-white shadow rounded-lg p-4 cursor-pointer'
+         hx-get="/project/{{ project.number }}/editor"
+         hx-target="#editor-view"
+         hx-trigger="click"
+         hx-swap="innerHTML">
+        <h3 class='text-lg font-semibold mb-2 text-blue-600'>
+            {{ project.title }}
         </h3>
         <p class='text-sm text-gray-600 mb-2'>
-	    <span class='font-semibold'>Created:</span> {{ project.formatted_date }}
-	</p>
+            <span class='font-semibold'>Created:</span> {{ project.formatted_date }}
+        </p>
         <p class='text-sm mb-2'>
             <span class='font-semibold'>Status:</span> {{ project.status_emoji }} {{ 'Closed' if project.closed else 'Open' }}
         </p>

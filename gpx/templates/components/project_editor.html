@@ -1,0 +1,24 @@
+<div id="editor-view" class="bg-white shadow-lg rounded-lg p-6 mt-4">
+    <h2 class="text-2xl font-bold mb-4">{{ project.title }}</h2>
+    <p class="text-gray-600 mb-4">{{ project.shortDescription }}</p>
+    
+    <h3 class="text-xl font-semibold mb-2">Items</h3>
+    <ul class="space-y-2">
+        {% for item in project.items.nodes %}
+            <li class="bg-gray-100 p-3 rounded">
+                {% for field_value in item.fieldValues.nodes %}
+                    <p><strong>{{ field_value.field.name }}:</strong> {{ field_value.text }}</p>
+                {% endfor %}
+            </li>
+        {% endfor %}
+    </ul>
+    
+    <div class="mt-4">
+        <h3 class="text-xl font-semibold mb-2">Add New Item</h3>
+        <form hx-post="/project/{{ project.id }}/item" hx-target="#editor-view" hx-swap="outerHTML">
+            <input type="text" name="title" placeholder="Item Title" class="w-full p-2 border rounded mb-2">
+            <textarea name="description" placeholder="Item Description" class="w-full p-2 border rounded mb-2"></textarea>
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Add Item</button>
+        </form>
+    </div>
+</div>

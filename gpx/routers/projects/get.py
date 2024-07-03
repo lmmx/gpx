@@ -1,17 +1,19 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 import textwrap
 from fastapi.responses import HTMLResponse
+from pydantic import ValidationError
 import httpx
 import logging
 from ...dependencies import User, get_user
 from ...jinja import templates
 from ...urls import GITHUB_API_URL
-from .models import ProjectsQueryResponse
+from .project_models import ProjectsQueryResponse
+from .item_models import ItemQueryResponse
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-__all__ = ["get_projects", "get_project_items"]
+__all__ = ["get_projects", "get_project_items", "get_project_editor"]
 
 router = APIRouter()
 
@@ -114,3 +116,63 @@ async def get_project_items(project_id: int, user: User = Depends(get_user)):
         {items_html}
     </div>
     """
+
+@router.get("/project/{project_number}/editor", response_class=HTMLResponse)
+async def get_project_editor(project_number: int, request: Request, user: User = Depends(get_user)):
+    query = textwrap.dedent(
+        """
+        query($number: Int!) {
+          viewer {
+            projectV2(number: $number) {
+              id
+              title
+              shortDescription
+              items(first: 100) {
+                nodes {
+                  id
+                  fieldValues(first: 10) {
+                    nodes {
+                      ... on ProjectV2ItemFieldTextValue {
+                        text
+                        field {
+                          name
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        """
+    )
+    
+    variables = {"number": project_number}
+    
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"{GITHUB_API_URL}/graphql",
+            headers={
+                "Authorization": f"token {user.access_token}",
+                "Accept": "application/vnd.github.v3+json",
+            },
+            json={"query": query, "variables": variables},
+        )
+    
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail="Failed to fetch project details")
+    
+    try:
+        query_result = ItemQueryResponse.model_validate(response.json())
+    except ValidationError as e:
+        logger.warn(f"Failed to validte: {response.json()}")
+        logger.warn(f"Bad value: {e.errors()}")
+        raise HTTPException(status_code=400, detail=f"Invalid response format: {e.errors()}")
+
+    project = query_result.data.viewer.project
+    
+    return templates.TemplateResponse("components/project_editor.html", {
+        "request": request,
+        "project": project
+    })
