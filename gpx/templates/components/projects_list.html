@@ -4,7 +4,8 @@
          hx-get="/project/{{ project.number }}/editor"
          hx-target="#editor-view"
          hx-trigger="click"
-         hx-swap="innerHTML">
+         hx-swap="innerHTML"
+         _="on htmx:afterOnLoad call toggleProjectsSection()">
         <h3 class='text-lg font-semibold mb-2 text-blue-600'>
             {{ project.title }}
         </h3>
