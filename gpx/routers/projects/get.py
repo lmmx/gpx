@@ -65,7 +65,7 @@ async def get_projects(request: Request, user: User = Depends(get_user)):
             status_code=400, detail=f"Query returned errors: {query_result.errors}"
         )
 
-    projects = query_result.data.viewer.projectsV2.nodes
+    projects = sorted(query_result.data.viewer.projectsV2.nodes, key=lambda x: x.number)
 
     if not projects:
         raise HTTPException(

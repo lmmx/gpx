@@ -1,5 +1,5 @@
 from __future__ import annotations
-from pydantic import BaseModel
+from pydantic import BaseModel, computed_field
 from datetime import datetime
 
 __all__ = [
@@ -19,6 +19,16 @@ class Project(BaseModel):
     resourcePath: str
     title: str
     url: str
+
+    @computed_field
+    @property
+    def formatted_date(self) -> str:
+        return self.createdAt.strftime("%Y-%m-%d")
+
+    @computed_field
+    @property
+    def status_emoji(self) -> str:
+        return "🔴" if self.closed else "🟢"
 
 
 class ProjectCollection(BaseModel):
