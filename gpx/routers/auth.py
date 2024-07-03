@@ -2,16 +2,16 @@ from fastapi import APIRouter, HTTPException, Request
 from urllib.parse import quote
 from fastapi.responses import RedirectResponse
 import httpx
-import os
 import logging
+from ..config import settings
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 __all__ = ["router", "login", "callback"]
 
-GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
-GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
+GITHUB_CLIENT_ID = settings.github_client_id
+GITHUB_CLIENT_SECRET = settings.github_client_secret
 
 router = APIRouter()
 
