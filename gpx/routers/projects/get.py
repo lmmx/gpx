@@ -9,6 +9,7 @@ from ...jinja import templates
 from ...urls import GITHUB_API_URL
 from .project_models import ProjectsQueryResponse
 from .item_models import ItemQueryResponse
+from .gql import get_projects_query, get_project_items_query
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -20,29 +21,8 @@ router = APIRouter()
 
 @router.get("/projects", response_class=HTMLResponse)
 async def get_projects(request: Request, user: User = Depends(get_user)):
-    query = textwrap.dedent(
-        """
-    query {
-      viewer {
-        id
-        login
-        name
-        projectsV2(first: 100) {
-          nodes {
-            closed
-            createdAt
-            public
-            number
-            resourcePath
-            title
-            url
-          }
-          totalCount
-        }
-      }
-    }
-    """
-    )
+    query = get_projects_query
+
     async with httpx.AsyncClient() as client:
         response = await client.post(
             f"{GITHUB_API_URL}/graphql",
@@ -119,53 +99,7 @@ async def get_project_items(project_id: int, user: User = Depends(get_user)):
 
 @router.get("/project/{project_number}/editor", response_class=HTMLResponse)
 async def get_project_editor(project_number: int, request: Request, user: User = Depends(get_user)):
-    query = textwrap.dedent(
-        """
-        query($number: Int!) {
-          viewer {
-            projectV2(number: $number) {
-              id
-              title
-              shortDescription
-              items(first: 100) {
-                nodes {
-                  id
-                  fieldValues(first: 10) {
-                    nodes {
-                      ... on ProjectV2ItemFieldTextValue {
-                        text
-                        field {
-                          ... on ProjectV2FieldCommon {
-                            name
-                          }
-                        }
-                      }
-                      ... on ProjectV2ItemFieldDateValue {
-                        date
-                        field {
-                          ... on ProjectV2FieldCommon {
-                            name
-                          }
-                        }
-                      }
-                      ... on ProjectV2ItemFieldSingleSelectValue {
-                        name
-                        field {
-                          ... on ProjectV2FieldCommon {
-                            name
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-        """
-    )
-    
+    query = get_project_items_query 
     variables = {"number": project_number}
     
     async with httpx.AsyncClient() as client:
@@ -182,7 +116,7 @@ async def get_project_editor(project_number: int, request: Request, user: User =
         raise HTTPException(status_code=response.status_code, detail="Failed to fetch project details")
 
     response_data = response.json()
-    logger.debug(f"API Response: {response_data}")
+    logger.warn(f"API Response: {response_data}")
     
     try:
         query_result = ItemQueryResponse.model_validate(response_data)
@@ -196,6 +130,9 @@ async def get_project_editor(project_number: int, request: Request, user: User =
         raise HTTPException(status_code=400, detail="GraphQL query returned errors")
 
     project = query_result.data.viewer.project
+    logger.warn(f"Loaded {len(project.items.nodes)} project items:")
+    for item in project.items.nodes[:1]:
+        logger.warn(f"{item.model_dump_json(indent=2)}")
     
     return templates.TemplateResponse("components/project_editor.html", {
         "request": request,
