@@ -135,7 +135,9 @@ async def get_project_editor(project_number: int, request: Request, user: User =
                       ... on ProjectV2ItemFieldTextValue {
                         text
                         field {
-                          name
+                          ... on ProjectV2FieldCommon {
+                            name
+                          }
                         }
                       }
                     }
@@ -162,13 +164,20 @@ async def get_project_editor(project_number: int, request: Request, user: User =
     
     if response.status_code != 200:
         raise HTTPException(status_code=response.status_code, detail="Failed to fetch project details")
+
+    response_data = response.json()
+    logger.debug(f"API Response: {response_data}")
     
     try:
-        query_result = ItemQueryResponse.model_validate(response.json())
+        query_result = ItemQueryResponse.model_validate(response_data)
     except ValidationError as e:
-        logger.warn(f"Failed to validte: {response.json()}")
-        logger.warn(f"Bad value: {e.errors()}")
+        logger.warn(f"Failed to validate: {response_data}")
+        logger.warn(f"Validation error: {e.errors()}")
         raise HTTPException(status_code=400, detail=f"Invalid response format: {e.errors()}")
+
+    if query_result.errors:
+        logger.error(f"GraphQL query returned errors: {query_result.errors}")
+        raise HTTPException(status_code=400, detail="GraphQL query returned errors")
 
     project = query_result.data.viewer.project
     

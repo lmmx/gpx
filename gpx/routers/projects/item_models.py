@@ -1,9 +1,11 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
+from typing import List, Optional, Dict, Any
 
 __all__ = [
-    "ItemField",
+    "ItemFieldCommon",
     "ItemFieldValue",
+    "ItemFieldValueNodes",
     "Item",
     "ItemCollection",
     "ProjectDetails",
@@ -12,24 +14,27 @@ __all__ = [
     "ItemQueryResponse",
 ]
 
-class ItemField(BaseModel):
+class ItemFieldCommon(BaseModel):
     name: str
 
 class ItemFieldValue(BaseModel):
-    text: str
-    field: ItemField
+    text: Optional[str] = None
+    field: Optional[ItemFieldCommon] = None
+
+class ItemFieldValueNodes(BaseModel):
+    nodes: List[ItemFieldValue]
 
 class Item(BaseModel):
     id: str
-    field_values: list[ItemFieldValue] = Field(..., alias="fieldValues")
+    field_values: ItemFieldValueNodes = Field(..., alias="fieldValues")
 
 class ItemCollection(BaseModel):
-    nodes: list[Item]
+    nodes: List[Item]
 
 class ProjectDetails(BaseModel):
     id: str
     title: str
-    short_description: str | None = Field(None, alias="shortDescription")
+    short_description: Optional[str] = Field(None, alias="shortDescription")
     items: ItemCollection
 
 class UserProject(BaseModel):
@@ -40,4 +45,4 @@ class ItemQueryData(BaseModel):
 
 class ItemQueryResponse(BaseModel):
     data: ItemQueryData
-    errors: list[dict] = []
+    errors: Optional[List[Dict[str, Any]]] = None

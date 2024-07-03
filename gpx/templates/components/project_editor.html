@@ -6,7 +6,7 @@
     <ul class="space-y-2">
         {% for item in project.items.nodes %}
             <li class="bg-gray-100 p-3 rounded">
-                {% for field_value in item.fieldValues.nodes %}
+                {% for field_value in item.field_values.nodes %}
                     <p><strong>{{ field_value.field.name }}:</strong> {{ field_value.text }}</p>
                 {% endfor %}
             </li>
