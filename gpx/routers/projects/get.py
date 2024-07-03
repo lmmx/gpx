@@ -131,8 +131,6 @@ async def get_project_editor(project_number: int, request: Request, user: User =
 
     project = query_result.data.viewer.project
     logger.warn(f"Loaded {len(project.items.nodes)} project items:")
-    for item in project.items.nodes[:1]:
-        logger.warn(f"{item.model_dump_json(indent=2)}")
     
     return templates.TemplateResponse("components/project_editor.html", {
         "request": request,
