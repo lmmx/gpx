@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 import textwrap
 from fastapi.responses import HTMLResponse
 import httpx
 import logging
 from ...dependencies import User, get_user
+from ...jinja import templates
 from ...urls import GITHUB_API_URL
+from .models import ProjectsQueryResponse
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -15,7 +17,7 @@ router = APIRouter()
 
 
 @router.get("/projects", response_class=HTMLResponse)
-async def get_projects(user: User = Depends(get_user)):
+async def get_projects(request: Request, user: User = Depends(get_user)):
     query = textwrap.dedent(
         """
     query {
@@ -48,36 +50,29 @@ async def get_projects(user: User = Depends(get_user)):
             },
             json={"query": query},
         )
+    status_code = response.status_code
 
-    if response.status_code != 200:
+    if status_code != 200:
+        raise HTTPException(status_code=status_code, detail="Failed to fetch projects")
+
+    try:
+        query_result = ProjectsQueryResponse.model_validate(response.json())
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=f"Invalid response format: {str(e)}")
+
+    if query_result.errors:
         raise HTTPException(
-            status_code=response.status_code, detail="Failed to fetch projects"
+            status_code=400, detail=f"Query returned errors: {query_result.errors}"
         )
 
-    results = response.json()
-    errors = results.get("errors", [])
-    if errors:
-        raise HTTPException(
-            status_code=400, detail=f"Results came back with errors: {errors}"
-        )
-    projects = results.get("data", {}).get("viewer", {}).get("projectsV2")
+    projects = query_result.data.viewer.projectsV2.nodes
+
     if not projects:
         raise HTTPException(
-            status_code=204, detail=f"Results came back with no content: {results}"
+            status_code=204, detail="No projects found for user"
         )
-    logger.warn(f"Got projects:\n{projects}")
-    projects_html = "".join(
-        [
-            f"<div class='bg-white shadow rounded-lg p-4 mb-4'><h3 class='text-lg font-semibold'>{idx}: {'Project name here'}</h3><p>{str(project)}</p></div>"
-            for idx, project in enumerate(projects.items())
-        ]
-    )
-
-    return f"""
-    <div id="projects" hx-swap-oob="true">
-        {projects_html}
-    </div>
-    """
+    
+    return templates.TemplateResponse("components/projects_list.html", {"request": request, "projects": projects})
 
 
 @router.get("/project/{project_id}/items", response_class=HTMLResponse)

@@ -1,8 +1,8 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 import os
+from .jinja import templates
 from .routers import auth, projects
 import logging
 
@@ -21,8 +21,6 @@ app.add_middleware(
     session_cookie="gpx_session_id",
     same_site="strict",
 )
-
-templates = Jinja2Templates(directory="gpx/templates")
 
 
 @app.get("/", response_class=HTMLResponse)

@@ -1,0 +1,21 @@
+<div id="projects" hx-swap-oob="true">
+    {% for project in projects %}
+    <div class='bg-white shadow rounded-lg p-4 mb-4'>
+        <h3 class='text-lg font-semibold mb-2'>
+            <a href='{{ project.url }}' target='_blank' class='text-blue-600 hover:text-blue-800'>
+                {{ project.title }}
+            </a>
+        </h3>
+        <p class='text-sm text-gray-600 mb-2'>Created: {{ project.createdAt }}</p>
+        <p class='text-sm mb-2'>
+            <span class='font-semibold'>Status:</span> {{ 'Closed' if project.closed else 'Open' }}
+        </p>
+        <p class='text-sm mb-2'>
+            <span class='font-semibold'>Visibility:</span> {{ 'Public' if project.public else 'Private' }}
+        </p>
+        <p class='text-sm'>
+            <span class='font-semibold'>Project Number:</span> {{ project.number }}
+        </p>
+    </div>
+    {% endfor %}
+</div>
