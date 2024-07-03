@@ -21,8 +21,10 @@ async def generate_github_emoji_map() -> Dict[str, str]:
     emoji_data = await fetch_github_emojis()
     return {f":{key}:": extract_emoji_code(value) for key, value in emoji_data.items()}
 
-
-GITHUB_EMOJI_MAP = asyncio.run(generate_github_emoji_map())
+try:
+    GITHUB_EMOJI_MAP = asyncio.run(generate_github_emoji_map())
+except:
+    GITHUB_EMOJI_MAP = {}
 
 
 def get_github_emoji_map() -> Dict[str, str]:
