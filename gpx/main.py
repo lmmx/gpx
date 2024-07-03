@@ -1,17 +1,13 @@
 from fastapi import FastAPI, Request
-from pathlib import Path
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 import os
-from dotenv import load_dotenv
 from .routers import auth, projects
 import logging
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
-
-load_dotenv()
 
 app = FastAPI()
 app.include_router(auth.router)
@@ -27,6 +23,7 @@ app.add_middleware(
 )
 
 templates = Jinja2Templates(directory="gpx/templates")
+
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
