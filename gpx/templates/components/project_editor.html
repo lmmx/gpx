@@ -7,15 +7,17 @@
         {% for item in project.items.nodes %}
             <div class="bg-gray-100 p-4 rounded shadow">
                 {% for field_value in item.field_values.nodes %}
-                    {% if field_value.text is not none or field_value.date is not none or field_value.name is not none %}
+                    {% if field_value.__class__.__name__ != 'ItemFieldEmptyValue' %}
                         <p class="mb-2">
                             <span class="font-semibold">{{ field_value.field.name }}:</span>
-                            {% if field_value.text is not none %}
+                            {% if field_value.__class__.__name__ == 'ItemFieldTextValue' %}
                                 {{ field_value.text }}
-                            {% elif field_value.date is not none %}
+                            {% elif field_value.__class__.__name__ == 'ItemFieldDateValue' %}
                                 {{ field_value.date }}
-                            {% elif field_value.name is not none %}
+                            {% elif field_value.__class__.__name__ == 'ItemFieldSingleSelectValue' %}
                                 {{ field_value.name }}
+                            {% else %}
+                                N/A
                             {% endif %}
                         </p>
                     {% endif %}

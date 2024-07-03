@@ -6,7 +6,7 @@ from typing import Optional, Union
 
 class ItemFieldCommon(BaseModel):
     name: str
-    dataType: Optional[str] = None
+    data_type: Optional[str] = Field(None, alias="dataType")
 
 
 class ItemFieldTextValue(BaseModel):
@@ -42,7 +42,7 @@ class ItemFieldValueNodes(BaseModel):
 
 class Item(BaseModel):
     id: str
-    fieldValues: ItemFieldValueNodes
+    field_values: ItemFieldValueNodes = Field(..., alias="fieldValues")
 
 
 class ItemCollection(BaseModel):
@@ -52,7 +52,7 @@ class ItemCollection(BaseModel):
 class ProjectDetails(BaseModel):
     id: str
     title: str
-    shortDescription: Optional[str] = None
+    short_description: Optional[str] = Field(None, alias="shortDescription")
     items: ItemCollection
 
 
