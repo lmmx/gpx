@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     session_secret_key: str
     debug: bool = False
     github_access_token_override: str = ""
+    server_url: str = "https://gpx.onrender.com"
 
     class Config:
         env_file = ".env"
