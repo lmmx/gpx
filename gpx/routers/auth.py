@@ -36,8 +36,6 @@ async def login():
     # This is the URL suffix used by the GitHub GraphQL API Explorer app:
     # params = "&scope=user%2Cpublic_repo%2Crepo%2Crepo_deployment%2Crepo%3Astatus%2Cread%3Arepo_hook%2Cread%3Aorg%2Cread%3Apublic_key%2Cread%3Agpg_key%2Cread%3Apackages%2Cread%3Adiscussion%2Cread%3Aenterprise%2Cread%3Aproject"
     scopes = quote(",".join(gh_scopes))
-    # This is the one I was using:
-    # scopes = "project read:project projects_v2 read:org repo read:user user:email"
     url = f"https://github.com/login/oauth/authorize?client_id={GITHUB_CLIENT_ID}&scope={scopes}"
     return url
 
@@ -63,4 +61,4 @@ async def callback(code: str, request: Request):
         raise HTTPException(status_code=400, detail="Failed to obtain access token")
 
     request.session["user"] = {"access_token": access_token}
-    return "https://gpx.onrender.com"
+    return settings.server_url
