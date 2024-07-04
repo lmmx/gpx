@@ -15,15 +15,7 @@
         
         {% include "components/login_section.html" %}
         
-        <div id="projects-section" class="mb-8">
-            <h2 class="text-2xl font-semibold mb-4">Your Projects</h2>
-            <div id="projects" 
-                 hx-get="/projects" 
-                 hx-trigger="load" 
-                 hx-target="this">
-                Loading projects...
-            </div>
-        </div>
+	{% include "components/projects_section.html" %}
 
         <div id="editor-view"></div>
 
@@ -32,30 +24,7 @@
         {% include "components/add_item_section.html" %}
     </div>
 
-    <script type="text/hyperscript">
-        {% include "components/hyperscript.html" %}
-
-        def toggleProjectsSection()
-            set projectsSection to #projects-section
-            set toggleButton to #toggle-projects
-            if projectsSection.classList.contains('hidden') then
-                remove .hidden from projectsSection
-                set toggleButton.textContent to 'Hide Projects'
-            else
-                add .hidden to projectsSection
-                set toggleButton.textContent to 'Show Projects'
-            end
-            remove .hidden from toggleButton
-        end
-
-        on htmx:afterOnLoad from #editor-view
-            call toggleProjectsSection()
-        end
-
-        on click from #toggle-projects
-            call toggleProjectsSection()
-        end
-    </script>
+    {% include "components/hyperscript.html" %}
 
     <button id="toggle-projects" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mt-4 hidden">
         Show Projects

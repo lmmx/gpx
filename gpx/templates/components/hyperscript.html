@@ -1,3 +1,4 @@
+<script type="text/hyperscript">
 def fetchItems(projectId)
     set #project-items.innerHTML to "Loading items..."
     fetch(`/project/${projectId}/items`)
@@ -14,3 +15,25 @@ on htmx:afterOnLoad from #projects
         append newOption to #project-selector
     end
 end
+
+def toggleProjectsSection()
+    set projectsSection to #projects-section
+    set toggleButton to #toggle-projects
+    if projectsSection.classList.contains('hidden') then
+        remove .hidden from projectsSection
+        set toggleButton.textContent to 'Hide Projects'
+    else
+        add .hidden to projectsSection
+        set toggleButton.textContent to 'Show Projects'
+    end
+    remove .hidden from toggleButton
+end
+
+on htmx:afterOnLoad from #editor-view
+    call toggleProjectsSection()
+end
+
+on click from #toggle-projects
+    call toggleProjectsSection()
+end
+</script>
