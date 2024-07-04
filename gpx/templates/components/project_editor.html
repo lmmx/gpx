@@ -3,7 +3,7 @@
     <p class="text-gray-600 mb-4">{{ project.shortDescription }}</p>
     
     <h3 class="text-xl font-semibold mb-2">Items</h3>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div id="project-items" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {% for item in project.items.nodes %}
             <div class="bg-gray-100 p-4 rounded shadow">
                 {% for field_value in item.field_values.nodes %}
@@ -26,12 +26,37 @@
         {% endfor %}
     </div>
     
-    <div class="mt-4">
-        <h3 class="text-xl font-semibold mb-2">Add New Item</h3>
-        <form hx-post="/project/{{ project.id }}/item" hx-target="#editor-view" hx-swap="outerHTML">
-            <input type="text" name="title" placeholder="Item Title" class="w-full p-2 border rounded mb-2">
-            <textarea name="description" placeholder="Item Description" class="w-full p-2 border rounded mb-2"></textarea>
-            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Add Item</button>
+    <div class="mt-8">
+        <h3 class="text-xl font-semibold mb-4">Add New Item</h3>
+        <form hx-post="/project/{{ project.id }}/item" 
+              hx-target="#project-items" 
+              hx-swap="beforeend"
+              class="space-y-4">
+            <div>
+                <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
+                <input type="text" name="title" id="title" required
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            </div>
+            <div>
+                <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                <select name="status" id="status" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    <option value="Todo">Todo</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Done">Done</option>
+                </select>
+            </div>
+            <div>
+                <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                <textarea name="description" id="description" rows="3"
+                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+            </div>
+            <div>
+                <button type="submit" 
+                        class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Add Item
+                </button>
+            </div>
         </form>
     </div>
 </div>

@@ -68,3 +68,34 @@ query($number: Int!) {
   }
 }
 """
+
+add_project_item_mutation = """
+mutation($input: AddProjectV2ItemByIdInput!) {
+  addProjectV2ItemById(input: $input) {
+    item {
+      id
+      title
+      fieldValues(first: 10) {
+        nodes {
+          ... on ProjectV2ItemFieldTextValue {
+            text
+            field {
+              ... on ProjectV2FieldCommon {
+                name
+              }
+            }
+          }
+          ... on ProjectV2ItemFieldSingleSelectValue {
+            name
+            field {
+              ... on ProjectV2FieldCommon {
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+"""
