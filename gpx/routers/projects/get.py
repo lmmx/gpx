@@ -21,7 +21,6 @@ router = APIRouter()
 @router.get("/projects", response_class=HTMLResponse)
 async def get_projects(request: Request, user: User = Depends(get_user)):
     query = get_projects_query
-
     async with httpx.AsyncClient() as client:
         response = await client.post(
             f"{GITHUB_API_URL}/graphql",
@@ -32,27 +31,21 @@ async def get_projects(request: Request, user: User = Depends(get_user)):
             json={"query": query},
         )
     status_code = response.status_code
-
     if status_code != 200:
         raise HTTPException(status_code=status_code, detail="Failed to fetch projects")
-
     try:
         query_result = ProjectsQueryResponse.model_validate(response.json())
     except ValueError as e:
         raise HTTPException(
             status_code=400, detail=f"Invalid response format: {str(e)}"
         )
-
     if query_result.errors:
         raise HTTPException(
             status_code=400, detail=f"Query returned errors: {query_result.errors}"
         )
-
     projects = sorted(query_result.data.viewer.projectsV2.nodes, key=lambda x: x.number)
-
     if not projects:
         raise HTTPException(status_code=204, detail="No projects found for user")
-
     return templates.TemplateResponse(
         "components/projects_list.html", {"request": request, "projects": projects}
     )
