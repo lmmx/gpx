@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
-import textwrap
 from fastapi.responses import HTMLResponse
 from pydantic import ValidationError
 import httpx
@@ -40,7 +39,9 @@ async def get_projects(request: Request, user: User = Depends(get_user)):
     try:
         query_result = ProjectsQueryResponse.model_validate(response.json())
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=f"Invalid response format: {str(e)}")
+        raise HTTPException(
+            status_code=400, detail=f"Invalid response format: {str(e)}"
+        )
 
     if query_result.errors:
         raise HTTPException(
@@ -50,11 +51,11 @@ async def get_projects(request: Request, user: User = Depends(get_user)):
     projects = sorted(query_result.data.viewer.projectsV2.nodes, key=lambda x: x.number)
 
     if not projects:
-        raise HTTPException(
-            status_code=204, detail="No projects found for user"
-        )
-    
-    return templates.TemplateResponse("components/projects_list.html", {"request": request, "projects": projects})
+        raise HTTPException(status_code=204, detail="No projects found for user")
+
+    return templates.TemplateResponse(
+        "components/projects_list.html", {"request": request, "projects": projects}
+    )
 
 
 @router.get("/project/{project_id}/items", response_class=HTMLResponse)
@@ -97,11 +98,14 @@ async def get_project_items(project_id: int, user: User = Depends(get_user)):
     </div>
     """
 
+
 @router.get("/project/{project_number}/editor", response_class=HTMLResponse)
-async def get_project_editor(project_number: int, request: Request, user: User = Depends(get_user)):
-    query = get_project_items_query 
+async def get_project_editor(
+    project_number: int, request: Request, user: User = Depends(get_user)
+):
+    query = get_project_items_query
     variables = {"number": project_number}
-    
+
     async with httpx.AsyncClient() as client:
         response = await client.post(
             f"{GITHUB_API_URL}/graphql",
@@ -111,19 +115,23 @@ async def get_project_editor(project_number: int, request: Request, user: User =
             },
             json={"query": query, "variables": variables},
         )
-    
+
     if response.status_code != 200:
-        raise HTTPException(status_code=response.status_code, detail="Failed to fetch project details")
+        raise HTTPException(
+            status_code=response.status_code, detail="Failed to fetch project details"
+        )
 
     response_data = response.json()
     logger.warn(f"API Response: {response_data}")
-    
+
     try:
         query_result = ItemQueryResponse.model_validate(response_data)
     except ValidationError as e:
         logger.warn(f"Failed to validate: {response_data}")
         logger.warn(f"Validation error: {e.errors()}")
-        raise HTTPException(status_code=400, detail=f"Invalid response format: {e.errors()}")
+        raise HTTPException(
+            status_code=400, detail=f"Invalid response format: {e.errors()}"
+        )
 
     if query_result.errors:
         logger.error(f"GraphQL query returned errors: {query_result.errors}")
@@ -131,8 +139,7 @@ async def get_project_editor(project_number: int, request: Request, user: User =
 
     project = query_result.data.viewer.project
     logger.warn(f"Loaded {len(project.items.nodes)} project items:")
-    
-    return templates.TemplateResponse("components/project_editor.html", {
-        "request": request,
-        "project": project
-    })
+
+    return templates.TemplateResponse(
+        "components/project_editor.html", {"request": request, "project": project}
+    )
