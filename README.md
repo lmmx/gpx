@@ -14,7 +14,7 @@ and ultimately aims to use GitHub Projects as a storage layer for more sophistic
 
 ## Installation
 
-To try it out for alpha testing, visit <strikethrough>[gpx.onrender.com](https://gpx.onrender.com)</strikethrough> [gpx-production.up.railway.app](https://gpx-production.up.railway.app)
+To try it out for alpha testing, visit <s>[gpx.onrender.com](https://gpx.onrender.com)</s> [gpx-production.up.railway.app](https://gpx-production.up.railway.app)
 
 - App link: [github.com/apps/gpx-projects](https://github.com/apps/gpx-projects)
 
