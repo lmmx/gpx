@@ -14,6 +14,7 @@ __all__ = [
 class Project(BaseModel):
     closed: bool
     createdAt: datetime
+    updatedAt: datetime
     public: bool
     number: int
     resourcePath: str
@@ -24,6 +25,11 @@ class Project(BaseModel):
     @property
     def formatted_date(self) -> str:
         return self.createdAt.strftime("%Y-%m-%d")
+
+    @computed_field
+    @property
+    def formatted_update_date(self) -> str:
+        return self.updatedAt.strftime("%Y-%m-%d")
 
     @computed_field
     @property

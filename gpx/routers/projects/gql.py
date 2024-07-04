@@ -8,6 +8,7 @@ query {
       nodes {
         closed
         createdAt
+        updatedAt
         public
         number
         resourcePath
