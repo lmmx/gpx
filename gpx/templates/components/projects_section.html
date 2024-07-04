@@ -13,11 +13,16 @@
 
 <script type="text/hyperscript">
 def filterProjects()
-    set query to lower(#project-search.value)
-    for project in #projects .project-item
-        set title to lower(project.querySelector('h3').textContent)
-        if title contains query
-            remove .hidden from project
+    set query to #project-search.value.toLowerCase()
+    for project in #projects.querySelectorAll('.project-item')
+        set titleH3 to project.querySelector('h3')
+        if titleH3 is not null
+            set title to titleH3.textContent.toLowerCase()
+            if title contains query
+                remove .hidden from project
+            else
+                add .hidden to project
+            end
         else
             add .hidden to project
         end
