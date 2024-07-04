@@ -1,9 +1,10 @@
 from fastapi import APIRouter, HTTPException, Request
 from urllib.parse import quote
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, HTMLResponse
 import httpx
 import logging
 from ..config import settings
+from ..jinja import templates
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -62,3 +63,9 @@ async def callback(code: str, request: Request):
 
     request.session["user"] = {"access_token": access_token}
     return settings.server_url
+
+
+@router.post("/logout", response_class=HTMLResponse)
+async def logout(request: Request):
+    request.session.clear()
+    return templates.TemplateResponse("components/login_section.html", {"request": request, "settings": settings})

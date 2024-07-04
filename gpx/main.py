@@ -25,7 +25,8 @@ app.add_middleware(
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    context = {"request": request, "settings": settings}
+    return templates.TemplateResponse("index.html", context)
 
 
 def serve():
