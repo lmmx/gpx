@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from starlette.middleware.sessions import SessionMiddleware
-import os
+from .config import settings
 from .jinja import templates
 from .routers import auth, projects
 import logging
@@ -13,10 +13,10 @@ app = FastAPI()
 app.include_router(auth.router)
 app.include_router(projects.router)
 
-# Cookie named "gpx_session_id" to be set on `https://gpx.onrender.com`
+# Cookie named "gpx_session_id" to be set on server URL
 app.add_middleware(
     SessionMiddleware,
-    secret_key=os.getenv("SESSION_SECRET_KEY"),
+    secret_key=settings.session_secret_key,
     https_only=True,
     session_cookie="gpx_session_id",
     same_site="strict",
